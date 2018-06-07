@@ -1,0 +1,10 @@
+ext.versions = [
+    minSdk            : 19,
+    compileSdk        : 27,
+    buildTools        : '27.1.1',
+    publishVersion    : '0.0.0.1',
+    publishVersionCode: 1,
+
+    supportLib        : '27.1.1',
+    googleSupportLib  : '12.0.1',
+]

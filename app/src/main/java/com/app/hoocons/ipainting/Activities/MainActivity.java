@@ -1,4 +1,4 @@
-package com.app.hoocons.ipainting;
+package com.app.hoocons.ipainting.Activities;
 
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.app.hoocons.ipainting.R;
 import com.app.hoocons.ipainting.ViewFragments.DrawingFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             this.startedExiting = true;
-            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_back_exit, Toast.LENGTH_SHORT).show();
 
             new Handler().postDelayed(new Runnable() {
                 @Override

@@ -3,4 +3,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <!-- Toast Values -->
+    <string name="toast_back_exit">click BACK again to exit app</string>
 </resources>

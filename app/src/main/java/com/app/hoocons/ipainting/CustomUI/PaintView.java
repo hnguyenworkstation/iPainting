@@ -16,7 +16,9 @@ import android.view.View;
 import com.app.hoocons.ipainting.Entities.BrushStroke;
 import com.app.hoocons.ipainting.Helpers.Constants;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -43,8 +45,14 @@ public class PaintView extends View {
     // Keep track of the path that user is currently drawing (latest touching action down)
     private Path mDrawingPath;
 
-    // Collections of strokes that have been drew to the view
-    private List<BrushStroke> paintStrokes;
+    // Stack - Collections of strokes that have been drew to the view
+    private Deque<BrushStroke> paintStrokes;
+
+    // Stack - Collections of strokes that have been removed by users
+    private Deque<BrushStroke> removedStrokes;
+
+    // Keeping track of which position was last touched on the screen's surface
+    private float lastX, lastY;
 
     public PaintView(Context context) {
         super(context, null);
@@ -74,10 +82,8 @@ public class PaintView extends View {
     * Initialize needed variables to be able to draw stuffs
     * */
     public void init(DisplayMetrics metrics) {
-        int height = metrics.heightPixels;
-        int width = metrics.widthPixels;
-
-        paintStrokes = new ArrayList<>();
+        paintStrokes = new ArrayDeque<>();
+        removedStrokes = new ArrayDeque<>();
         mDrawingPath = new Path();
 
         currentPaintColor = Constants.DEFAULT_PAINT_COLOR;
@@ -102,6 +108,32 @@ public class PaintView extends View {
     }
 
 
+    /**
+     * Go back one step.
+     * Allow user to remove the latest path displayed on the screen
+     * --> removed first item in the paint strokes stack (latest painted stroke)
+     * --> then temporary store that stroke into the removedStroke stack
+     */
+    public void goBackOneStep() {
+        if (paintStrokes.size() > 0) {
+            removedStrokes.push(paintStrokes.removeFirst());
+            invalidate();
+        }
+    }
+
+
+    /*
+    * Go forward one step
+    * Reverse one step forward if user mistakenly went back one step
+    * --> pop the item in removed strokes stack and push back to the paint strokes
+    * */
+    public void goForwardOneStep() {
+        if (removedStrokes.size() > 0) {
+            paintStrokes.push(removedStrokes.removeFirst());
+            invalidate();
+        }
+    }
+
     /*
     * onTouchEvent:
     *
@@ -110,31 +142,50 @@ public class PaintView extends View {
     * screen so that can see what he/she is drawing
     *
     * -> Action Move: user wants to make shape for the stroke looking good, also need to update the
-    * current drawing stroke to the screen
+    * current drawing stroke to the screen. Add a quadratic bezier from the last point, approaching
+    * control point (x1,y1), and ending at (x2,y2). Using quadTo for path tempting to make the curved
+    * line so it looks smoother when making turn in example.
     *
     * -> Action Up: Finally, the user has finished the current drawing line, so we need to collect
-    * the current path and store it into the collection of strokes and display the whole updated
-    * strokes collection again.
+    * the current path and store it into the collection of strokes by pushing to the stack of strokes,
+    * then display the whole updated strokes collection again.
     * */
     @Override
     @SuppressLint("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
+                /* When user started drawing a new stroke -- clear the temporary removed strokes */
+                removedStrokes.clear();
+
                 mDrawingPath.moveTo(event.getX(), event.getY());
-                invalidate();
+                lastX = event.getX();
+                lastY = event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                mDrawingPath.lineTo(event.getX(), event.getY());
-                invalidate();
+                /*
+                * the ending point of quad (x2, y2) is the average point between the current touching [x,y] coordinate and last touching coordinate
+                * because it make the line looks smoother when we make a turn on the line
+                * Else, if we use the current touching [x,y] as the ending point of quad,
+                * the line will have a sharp point of any peak when we make a line curving
+                * */
+                mDrawingPath.quadTo(lastX, lastY, (lastX + event.getX()) / 2, (lastY + event.getY()) / 2);
+                lastX = event.getX();
+                lastY = event.getY();
                 break;
             case MotionEvent.ACTION_UP:
-                // Add current stroke to the list and reinitialize the current drawing path
-                paintStrokes.add(new BrushStroke(currentPaintColor, brushWidth, mDrawingPath));
-                invalidate();
+                mDrawingPath.lineTo(event.getX(), event.getY());
+
+                // Save the current stroke to the list and reset the current drawing path
+                Path savedPath = new Path();
+                savedPath.addPath(mDrawingPath);
+                paintStrokes.push(new BrushStroke(currentPaintColor, brushWidth, savedPath));
+
+                mDrawingPath.reset();
                 break;
         }
 
+        invalidate();
         return true;
     }
 }
