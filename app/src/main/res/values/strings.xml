@@ -15,4 +15,7 @@
 
     <!-- Toast Values -->
     <string name="toast_back_exit">click BACK again to exit app</string>
+
+    <!-- Description value -->
+    <string name="image_btn_description">General Action Image Button</string>
 </resources>

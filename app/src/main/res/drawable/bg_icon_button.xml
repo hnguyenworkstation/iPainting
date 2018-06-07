@@ -7,6 +7,7 @@
             <solid android:color="@color/black_alpha_12" />
         </shape>
     </item>
+
     <item android:state_pressed="true">
         <shape android:shape="oval">
             <solid android:color="@color/gray_alpha" />

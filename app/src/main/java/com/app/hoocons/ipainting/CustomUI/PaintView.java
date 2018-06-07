@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -53,6 +55,9 @@ public class PaintView extends View {
 
     // Keeping track of which position was last touched on the screen's surface
     private float lastX, lastY;
+
+    // Current action determine what the painter should be doing when the touch event happens
+    private Constants.Action mCurrentAction;
 
     public PaintView(Context context) {
         super(context, null);
@@ -109,7 +114,12 @@ public class PaintView extends View {
             canvas.drawPath(stroke.getPath(), mPaint);
 
             // After drawing the previous stroke -- set back the properties of painter to current
-            mPaint.setColor(currentPaintColor);
+            if (mCurrentAction == Constants.Action.PAINTING) {
+                mPaint.setColor(currentPaintColor);
+            } else {
+                mPaint.setColor(backgroundColor);
+            }
+
             mPaint.setStrokeWidth(brushWidth);
         }
 
@@ -137,6 +147,24 @@ public class PaintView extends View {
     public void changeBrushSize(int brushWidth) {
         mPaint.setStrokeWidth(brushWidth);
         this.brushWidth = brushWidth;
+    }
+
+    /**
+     * Change action.
+     *
+     * Update the action for paint
+     * -- If the action is erasing, we need to make the paint has the same color as the background
+     *
+     * @param action the action
+     */
+    public void changeAction(Constants.Action action) {
+        mCurrentAction = action;
+
+        if (action == Constants.Action.PAINTING) {
+            mPaint.setColor(currentPaintColor);
+        } else if (action == Constants.Action.ERASING) {
+            mPaint.setColor(backgroundColor);
+        }
     }
 
 
@@ -213,7 +241,12 @@ public class PaintView extends View {
                 // Save the current stroke to the list and reset the current drawing path
                 Path savedPath = new Path();
                 savedPath.addPath(mDrawingPath);
-                paintStrokes.push(new BrushStroke(currentPaintColor, brushWidth, savedPath));
+
+                if (mCurrentAction == Constants.Action.PAINTING) {
+                    paintStrokes.push(new BrushStroke(currentPaintColor, brushWidth, savedPath));
+                } else {
+                    paintStrokes.push(new BrushStroke(backgroundColor, brushWidth, savedPath));
+                }
 
                 mDrawingPath.reset();
                 invalidate();

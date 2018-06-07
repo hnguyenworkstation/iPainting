@@ -4,6 +4,7 @@
     <!-- icon diments -->
     <dimen name="tabbar_icon_size">32dp</dimen>
     <dimen name="menu_icon_size">24dp</dimen>
+    <dimen name="icon_button_size">42dp</dimen>
 
     <!-- circle shape dimens -->
     <dimen name="circle_size">82dp</dimen>

@@ -27,4 +27,39 @@
         android:maxLines="1"
         android:text="@string/app_name"
         android:textColor="@color/text_dark_color" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:contentDescription="@string/image_btn_description"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:layout_margin="4dp"
+            android:background="@null"
+            android:id="@+id/pen_action_btn"
+            android:src="@drawable/ic_pencil"/>
+
+        <ImageButton
+            android:contentDescription="@string/image_btn_description"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:layout_margin="4dp"
+            android:background="@null"
+            android:id="@+id/eraser_action_btn"
+            android:src="@drawable/ic_eraser"/>
+
+        <ImageButton
+            android:contentDescription="@string/image_btn_description"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:layout_margin="4dp"
+            android:background="@null"
+            android:id="@+id/more_action_btn"
+            android:src="@drawable/ic_more_vert"/>
+    </LinearLayout>
 </RelativeLayout>

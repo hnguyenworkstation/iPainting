@@ -42,13 +42,16 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     private ImageButton mForceStepBtn;
 
     /* Menu Actions */
-    private LinearLayout mCustomToolbar;
     private LinearLayout mColorPicker;
     private LinearLayout mStrokeSizePicker;
 
     private FilledCircleView mSelectedColorCircle;
     private FilledCircleView mSizeCircle;
     private TextView mCurrentSizeTv;
+
+    private ImageButton mPencilActionBtn;
+    private ImageButton mEraserActionBtn;
+    private ImageButton mMoreActionBtn;
 
     /* picker dialog */
     private Dialog sizePickerDialog;
@@ -59,6 +62,8 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     private int currentStrokeSize;
     private int[] colors;
 
+    // Current action determine that if the user is currently wanted to draw or erase
+    private Constants.Action mCurrentAction;
 
     public DrawingFragment() {
         // Required empty public constructor
@@ -96,6 +101,8 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mCurrentAction = Constants.Action.PAINTING;
+
         bindViews(view);
         initViewEntities();
         initColorPickerDialog();
@@ -107,16 +114,20 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     private void bindViews(View parent) {
         mPaintView = (PaintView) parent.findViewById(R.id.paint_view);
 
+        /* Action Buttons */
         mBackStepBtn = (ImageButton) parent.findViewById(R.id.backstep_btn);
         mForceStepBtn = (ImageButton) parent.findViewById(R.id.forcestep_btn);
 
-        mCustomToolbar = (LinearLayout) parent.findViewById(R.id.custom_toolbar);
+        mPencilActionBtn = (ImageButton) parent.findViewById(R.id.pen_action_btn);
+        mEraserActionBtn = (ImageButton) parent.findViewById(R.id.eraser_action_btn);
+
         mColorPicker = (LinearLayout) parent.findViewById(R.id.color_picker);
         mStrokeSizePicker = (LinearLayout) parent.findViewById(R.id.size_picker);
         mSelectedColorCircle = (FilledCircleView) parent.findViewById(R.id.selected_color);
         mSizeCircle = (FilledCircleView) parent.findViewById(R.id.size_circle);
         mCurrentSizeTv = (TextView) parent.findViewById(R.id.stroke_size);
     }
+
 
     private void initViewEntities() {
         DisplayMetrics metrics = new DisplayMetrics();
@@ -133,6 +144,9 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
             if (mSizeCircle != null)
                 mSizeCircle.setColor(currentColor);
+
+            // Set initial action is Painting
+            updateAction(Constants.Action.PAINTING);
         } else {
             //Todo: Show an error message and reload app
         }
@@ -165,6 +179,22 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         // Init color picker dialog with custom view
         colorPickerDialog = new Dialog(getContext());
         colorPickerDialog.setContentView(customView);
+    }
+
+    // Update the selected action so user will be aware of it
+    // Also update the action to the paint in DrawView
+    private void updateAction(Constants.Action action) {
+        mCurrentAction = action;
+
+        if (mCurrentAction == Constants.Action.PAINTING) {
+            mPencilActionBtn.setBackground(getResources().getDrawable(R.drawable.bg_icon_button));
+            mEraserActionBtn.setBackground(null);
+        } else if (mCurrentAction == Constants.Action.ERASING) {
+            mEraserActionBtn.setBackground(getResources().getDrawable(R.drawable.bg_icon_button));
+            mPencilActionBtn.setBackground(null);
+        }
+
+        mPaintView.changeAction(action);
     }
 
 
@@ -228,6 +258,9 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         mBackStepBtn.setOnClickListener(this);
         mForceStepBtn.setOnClickListener(this);
 
+        mEraserActionBtn.setOnClickListener(this);
+        mPencilActionBtn.setOnClickListener(this);
+
         mColorPicker.setOnClickListener(this);
         mStrokeSizePicker.setOnClickListener(this);
     }
@@ -264,6 +297,12 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
                         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT);
                 }
+                break;
+            case R.id.pen_action_btn:
+                updateAction(Constants.Action.PAINTING);
+                break;
+            case R.id.eraser_action_btn:
+                updateAction(Constants.Action.ERASING);
                 break;
             default:
                 break;
