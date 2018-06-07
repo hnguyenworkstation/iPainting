@@ -13,9 +13,12 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.app.hoocons.ipainting.Adapters.ColorPickerAdapter;
@@ -29,6 +32,8 @@ import com.app.hoocons.ipainting.ViewHolders.OnColorClickListener;
  * The Drawing fragment.
  */
 public class DrawingFragment extends Fragment implements View.OnClickListener, OnColorClickListener {
+    private final int MIN_STROKE_SIZE = 5;
+
     /* View entities */
     private PaintView mPaintView;
 
@@ -45,7 +50,8 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     private FilledCircleView mSizeCircle;
     private TextView mCurrentSizeTv;
 
-    /* Color picker dialog */
+    /* picker dialog */
+    private Dialog sizePickerDialog;
     private Dialog colorPickerDialog;
     private ColorPickerAdapter colorPickerAdapter;
 
@@ -93,6 +99,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         bindViews(view);
         initViewEntities();
         initColorPickerDialog();
+        initSizePickerDialog();
         initClickListeners();
     }
 
@@ -131,6 +138,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         }
     }
 
+
     /*
     * initColorPickerDialog
     * This function will inflate the custom view for the dialog and make it as a color picker
@@ -138,7 +146,8 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     * available colors that the user can pick from.
     * */
     private void initColorPickerDialog() {
-        View customView = getLayoutInflater().inflate(R.layout.custom_color_picker_dialog_view, (ViewGroup) getView(), false);
+        View customView = getLayoutInflater().inflate(R.layout.custom_color_picker_dialog_view,
+                (ViewGroup) getView(), false);
 
         // Init custom view (list of colors) for the color picker dialog
         RecyclerView recyclerView = (RecyclerView) customView.findViewById(R.id.color_recycler);
@@ -156,7 +165,60 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         // Init color picker dialog with custom view
         colorPickerDialog = new Dialog(getContext());
         colorPickerDialog.setContentView(customView);
-        colorPickerDialog.setTitle(getString(R.string.title_color_picker_dialog));
+    }
+
+
+    /*
+    * initSizePickerDialog
+    * This function will inflate the custom view for the dialog and make it as a size picker
+    * This custom view will have a seekbar as a size selector and button to confirm
+    * */
+    private void initSizePickerDialog() {
+        final View customView = getLayoutInflater().inflate(R.layout.custom_size_picker_dialog_view,
+                (ViewGroup) getView(), false);
+
+        final SeekBar seekBar = (SeekBar) customView.findViewById(R.id.seekbar_size);
+        final TextView selectedSize = (TextView) customView.findViewById(R.id.size_tv);
+        Button pickBtn = (Button) customView.findViewById(R.id.pick_btn);
+
+        // Show current size value
+        selectedSize.setText(String.valueOf(currentStrokeSize));
+
+        seekBar.setProgress(currentStrokeSize - MIN_STROKE_SIZE);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                selectedSize.setText(String.valueOf(progress + MIN_STROKE_SIZE));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        pickBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sizePickerDialog != null) {
+                    // Update brush's size
+                    currentStrokeSize = seekBar.getProgress() + MIN_STROKE_SIZE;
+                    mPaintView.changeBrushSize(currentStrokeSize);
+                    mCurrentSizeTv.setText(String.valueOf(currentStrokeSize));
+
+                    sizePickerDialog.dismiss();
+                }
+            }
+        });
+
+        // Init color picker dialog with custom view
+        sizePickerDialog = new Dialog(getContext());
+        sizePickerDialog.setContentView(customView);
     }
 
     /*
@@ -182,10 +244,26 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
                     mPaintView.goForwardOneStep();
                 break;
             case R.id.color_picker:
-                if (colorPickerDialog != null)
+                if (colorPickerDialog != null) {
                     colorPickerDialog.show();
+                    Window window = colorPickerDialog.getWindow();
+
+                    // Update the dialog layout to match parent window
+                    if (window != null)
+                        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
                 break;
             case R.id.size_picker:
+                if (sizePickerDialog != null) {
+                    sizePickerDialog.show();
+                    Window window = sizePickerDialog.getWindow();
+
+                    // Update the dialog layout to match parent window
+                    if (window != null)
+                        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
                 break;
             default:
                 break;

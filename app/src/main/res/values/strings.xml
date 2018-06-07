@@ -6,9 +6,12 @@
 
     <!-- Title values -->
     <string name="title_color_picker_dialog">Color Picker</string>
+    <string name="title_size_picker_dialog">Stroke Size</string>
 
     <string name="menu_size_stroke">size:</string>
     <string name="menu_color">color:</string>
+
+    <string name="pick_size_dialog">Pick</string>
 
     <!-- Toast Values -->
     <string name="toast_back_exit">click BACK again to exit app</string>

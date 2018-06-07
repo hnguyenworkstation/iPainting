@@ -11,6 +11,7 @@
         android:textAlignment="center"
         android:layout_margin="8dp"
         android:text="@string/title_color_picker_dialog"
+        android:fontFamily="@font/roboto_medium"
         android:textSize="24sp"
         android:textColor="@android:color/black"/>
 
