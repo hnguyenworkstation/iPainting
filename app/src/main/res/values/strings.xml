@@ -4,6 +4,11 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- Title values -->
+    <string name="title_color_picker_dialog">Color Picker</string>
+
+    <string name="menu_size_stroke">size:</string>
+    <string name="menu_color">color:</string>
 
     <!-- Toast Values -->
     <string name="toast_back_exit">click BACK again to exit app</string>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Styleable attributes for filled circle view -->
+    <declare-styleable name="FilledCircle">
+        <attr name="filled_color" format="integer" />
+        <attr name="internal_padding" format="integer"/>
+    </declare-styleable>
+</resources>

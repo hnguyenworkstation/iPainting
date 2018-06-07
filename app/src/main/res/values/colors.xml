@@ -5,8 +5,27 @@
     <color name="colorAccent">#81CBC8</color>
     <color name="colorBackground">#f2f2f2</color>
 
+    <color name="text_dark_color">#424242</color>
+    <color name="text_med_color">#616161</color>
+    <color name="text_light_color">#757575</color>
+
     <color name="black_alpha_12">#1F000000</color>
     <color name="black_alpha_30">#4D000000</color>
     <color name="black_alpha_70">#B3000000</color>
     <color name="gray_alpha">#c2c2c2</color>
+
+
+    <array name="colors">
+        <item>#FF0000</item>
+        <item>#FF7F00</item>
+        <item>#FFFF00</item>
+        <item>#FF007F</item>
+        <item>#0000FF</item>
+        <item>#7F00FF</item>
+        <item>#FF00FF</item>
+        <item>#007FFF</item>
+        <item>#00FFFF</item>
+        <item>#00FF7F</item>
+        <item>#00FF00</item>
+    </array>
 </resources>

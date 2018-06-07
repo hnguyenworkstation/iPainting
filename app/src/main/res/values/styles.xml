@@ -14,4 +14,21 @@
 
     <style name="AppTheme" parent="AppTheme.Base"/>
 
+    <style name="MenuItemStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:background">@drawable/bg_rounded_shape</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+
+    <style name="MenuTextStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
 </resources>

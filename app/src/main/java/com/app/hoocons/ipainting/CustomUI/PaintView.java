@@ -19,6 +19,7 @@ import com.app.hoocons.ipainting.Helpers.Constants;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,7 +32,6 @@ import java.util.List;
 * PaintView is a custom view at a higher level which allow user to draw lines/shapes on it
 * -- PaintView will be able to listen to the touching events that happen to the view's surface
 * and then collect those drawing path and display it later on
-* Todo: update PaintView to listen to the properties changing from the DrawingFragment
 * */
 public class PaintView extends View {
     private final String TAG = this.getClass().getSimpleName();
@@ -81,14 +81,17 @@ public class PaintView extends View {
     /*
     * Initialize needed variables to be able to draw stuffs
     * */
-    public void init(DisplayMetrics metrics) {
+    public void init(int color, int size) {
         paintStrokes = new ArrayDeque<>();
         removedStrokes = new ArrayDeque<>();
         mDrawingPath = new Path();
 
-        currentPaintColor = Constants.DEFAULT_PAINT_COLOR;
+        currentPaintColor = color;
         backgroundColor = Constants.DEFAULT_BACKGROUND_COLOR;
-        brushWidth = Constants.DEFAULT_BRUSH_STROKE_SIZE;
+        brushWidth = size;
+
+        mPaint.setColor(currentPaintColor);
+        mPaint.setStrokeWidth(brushWidth);
     }
 
     @Override
@@ -96,15 +99,44 @@ public class PaintView extends View {
         // Drawing the screen background
         canvas.drawColor(backgroundColor);
 
-        // Drawing the current drawing stroke
-        canvas.drawPath(mDrawingPath, mPaint);
-
         // Drawing the strokes that previously drew to the screen
-        for (BrushStroke stroke : paintStrokes) {
+        Iterator iterator = paintStrokes.descendingIterator();
+
+        while (iterator.hasNext()) {
+            BrushStroke stroke = (BrushStroke) iterator.next();
             mPaint.setColor(stroke.getColor());
             mPaint.setStrokeWidth(stroke.getWidth());
             canvas.drawPath(stroke.getPath(), mPaint);
+
+            // After drawing the previous stroke -- set back the properties of painter to current
+            mPaint.setColor(currentPaintColor);
+            mPaint.setStrokeWidth(brushWidth);
         }
+
+        // Drawing the current drawing stroke
+        canvas.drawPath(mDrawingPath, mPaint);
+    }
+
+
+    /**
+     * Update brush color.
+     *
+     * @param color new color for the brush
+     */
+    public void changeColor(int color) {
+        mPaint.setColor(color);
+        currentPaintColor = color;
+    }
+
+
+    /**
+     * Update width of the brush
+     *
+     * @param brushWidth the brush width
+     */
+    public void changeBrushSize(int brushWidth) {
+        mPaint.setStrokeWidth(brushWidth);
+        this.brushWidth = brushWidth;
     }
 
 
@@ -161,6 +193,7 @@ public class PaintView extends View {
                 mDrawingPath.moveTo(event.getX(), event.getY());
                 lastX = event.getX();
                 lastY = event.getY();
+                invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 /*
@@ -172,6 +205,7 @@ public class PaintView extends View {
                 mDrawingPath.quadTo(lastX, lastY, (lastX + event.getX()) / 2, (lastY + event.getY()) / 2);
                 lastX = event.getX();
                 lastY = event.getY();
+                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 mDrawingPath.lineTo(event.getX(), event.getY());
@@ -182,10 +216,12 @@ public class PaintView extends View {
                 paintStrokes.push(new BrushStroke(currentPaintColor, brushWidth, savedPath));
 
                 mDrawingPath.reset();
+                invalidate();
+                break;
+            default:
                 break;
         }
 
-        invalidate();
         return true;
     }
 }

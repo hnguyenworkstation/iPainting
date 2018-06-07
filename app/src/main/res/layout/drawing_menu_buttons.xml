@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:filled_circle="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_icon_button"
+            android:src="@drawable/ic_action_back_step"
+            android:layout_margin="6dp"
+            android:id="@+id/backstep_btn"
+            android:foregroundGravity="center"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_force_step"
+            android:layout_margin="6dp"
+            android:id="@+id/forcestep_btn"
+            android:background="@drawable/bg_icon_button"
+            android:foregroundGravity="center"/>
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                style="@style/MenuItemStyle"
+                android:id="@+id/color_picker">
+
+                <TextView
+                    android:layout_margin="6dp"
+                    style="@style/MenuTextStyle"
+                    android:text="@string/menu_color" />
+
+                <com.app.hoocons.ipainting.CustomUI.FilledCircleView
+                    filled_circle:filled_color="@android:color/white"
+                    android:id="@+id/selected_color"
+                    android:layout_width="@dimen/menu_icon_size"
+                    android:layout_height="@dimen/menu_icon_size"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/MenuItemStyle"
+                android:id="@+id/size_picker">
+
+                <com.app.hoocons.ipainting.CustomUI.FilledCircleView
+                    filled_circle:filled_color="@android:color/white"
+                    android:id="@+id/size_circle"
+                    android:layout_width="@dimen/menu_icon_size"
+                    android:layout_height="@dimen/menu_icon_size"
+                    />
+
+                <TextView
+                    android:layout_margin="6dp"
+                    style="@style/MenuTextStyle"
+                    android:id="@+id/stroke_size"
+                    android:text="16" />
+            </LinearLayout>
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

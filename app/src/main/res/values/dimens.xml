@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- icon diments -->
+    <dimen name="tabbar_icon_size">32dp</dimen>
+    <dimen name="menu_icon_size">24dp</dimen>
+
+    <!-- circle shape dimens -->
+    <dimen name="circle_size">82dp</dimen>
+
+</resources>

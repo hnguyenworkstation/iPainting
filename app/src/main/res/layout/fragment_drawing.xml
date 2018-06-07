@@ -7,17 +7,25 @@
     <com.app.hoocons.ipainting.CustomUI.PaintView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/custom_toolbar"
         android:id="@+id/paint_view"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:focusable="false"
-        android:orientation="horizontal">
+        android:id="@+id/custom_toolbar"
+        android:orientation="vertical">
 
-        <include layout="@layout/back_force_steps_buttons"/>
+        <include layout="@layout/custom_drawing_actionbar"/>
 
+        <include layout="@layout/drawing_menu_buttons"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@drawable/scrim_view_topdown"/>
     </LinearLayout>
 </RelativeLayout>
