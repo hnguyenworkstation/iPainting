@@ -35,20 +35,16 @@ public class PaintView extends View {
     private final String TAG = this.getClass().getSimpleName();
 
     private Paint mPaint;
-    private Path mDrawingPath;
-
-    private Canvas mCanvas;
 
     private int currentPaintColor;
     private int backgroundColor;
     private int brushWidth;
 
+    // Keep track of the path that user is currently drawing (latest touching action down)
+    private Path mDrawingPath;
+
+    // Collections of strokes that have been drew to the view
     private List<BrushStroke> paintStrokes;
-
-    private Bitmap mBitmap;
-
-    /* This paint will be used to draw the bit map to the canvas layer */
-    private final Paint drawingPaint = new Paint(Paint.DITHER_FLAG);
 
     public PaintView(Context context) {
         super(context, null);
@@ -74,15 +70,15 @@ public class PaintView extends View {
         mPaint.setStrokeWidth(Constants.DEFAULT_BRUSH_STROKE_SIZE);
     }
 
+    /*
+    * Initialize needed variables to be able to draw stuffs
+    * */
     public void init(DisplayMetrics metrics) {
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
 
         paintStrokes = new ArrayList<>();
         mDrawingPath = new Path();
-
-        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        mCanvas = new Canvas(mBitmap);
 
         currentPaintColor = Constants.DEFAULT_PAINT_COLOR;
         backgroundColor = Constants.DEFAULT_BACKGROUND_COLOR;
@@ -105,6 +101,21 @@ public class PaintView extends View {
         }
     }
 
+
+    /*
+    * onTouchEvent:
+    *
+    * The view will be capture all touching event that happen to the view's surface
+    * -> Action Down: user wants to make a new stroke, so display the current drawing stroke to the
+    * screen so that can see what he/she is drawing
+    *
+    * -> Action Move: user wants to make shape for the stroke looking good, also need to update the
+    * current drawing stroke to the screen
+    *
+    * -> Action Up: Finally, the user has finished the current drawing line, so we need to collect
+    * the current path and store it into the collection of strokes and display the whole updated
+    * strokes collection again.
+    * */
     @Override
     @SuppressLint("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent event) {
