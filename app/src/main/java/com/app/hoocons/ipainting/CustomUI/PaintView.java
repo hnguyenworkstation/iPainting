@@ -127,6 +127,16 @@ public class PaintView extends View {
         canvas.drawPath(mDrawingPath, mPaint);
     }
 
+    /*
+    * Clear the view
+    * */
+    public void clear() {
+        paintStrokes.clear();
+        removedStrokes.clear();
+
+        invalidate();
+    }
+
 
     /**
      * Update brush color.

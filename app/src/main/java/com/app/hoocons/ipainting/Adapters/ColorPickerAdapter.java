@@ -17,7 +17,8 @@ import com.app.hoocons.ipainting.ViewHolders.OnColorClickListener;
  */
 
 /*
-*
+* Adapter for a list of colors objects
+* -- This adapter will work on generate/recycle/listen to each color's circle
 * */
 public class ColorPickerAdapter extends RecyclerView.Adapter<ColorViewHolder> {
     private Context context;

@@ -11,6 +11,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -18,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -64,6 +66,9 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
     // Current action determine that if the user is currently wanted to draw or erase
     private Constants.Action mCurrentAction;
+
+    // Popup menu will be used for more actions;
+    private PopupMenu mMoreMenu;
 
     public DrawingFragment() {
         // Required empty public constructor
@@ -120,6 +125,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
         mPencilActionBtn = (ImageButton) parent.findViewById(R.id.pen_action_btn);
         mEraserActionBtn = (ImageButton) parent.findViewById(R.id.eraser_action_btn);
+        mMoreActionBtn = (ImageButton) parent.findViewById(R.id.more_action_btn);
 
         mColorPicker = (LinearLayout) parent.findViewById(R.id.color_picker);
         mStrokeSizePicker = (LinearLayout) parent.findViewById(R.id.size_picker);
@@ -260,9 +266,34 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
         mEraserActionBtn.setOnClickListener(this);
         mPencilActionBtn.setOnClickListener(this);
+        mMoreActionBtn.setOnClickListener(this);
 
         mColorPicker.setOnClickListener(this);
         mStrokeSizePicker.setOnClickListener(this);
+    }
+
+
+    private void showPopUpMenu() {
+        if (mMoreMenu == null) {
+            mMoreMenu = new PopupMenu(getContext(), mMoreActionBtn);
+            mMoreMenu.inflate(R.menu.draw_menu);
+            mMoreMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.save_action:
+                            return true;
+                        case R.id.clear_action:
+                            mPaintView.clear();
+                            updateAction(Constants.Action.PAINTING);
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            });
+        }
+        mMoreMenu.show();
     }
 
     @Override
@@ -303,6 +334,9 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
                 break;
             case R.id.eraser_action_btn:
                 updateAction(Constants.Action.ERASING);
+                break;
+            case R.id.more_action_btn:
+                showPopUpMenu();
                 break;
             default:
                 break;

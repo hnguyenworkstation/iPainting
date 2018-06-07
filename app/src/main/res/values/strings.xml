@@ -10,6 +10,8 @@
 
     <string name="menu_size_stroke">size:</string>
     <string name="menu_color">color:</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_clear">Clear</string>
 
     <string name="pick_size_dialog">Pick</string>
 
