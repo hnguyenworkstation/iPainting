@@ -1,17 +1,24 @@
 package com.app.hoocons.ipainting.ViewFragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,20 +44,27 @@ import com.app.hoocons.ipainting.CustomUI.FilledCircleView;
 import com.app.hoocons.ipainting.CustomUI.PaintView;
 import com.app.hoocons.ipainting.Helpers.AppUtils;
 import com.app.hoocons.ipainting.Helpers.Constants;
+import com.app.hoocons.ipainting.Helpers.SaveImageToDiskAsync;
 import com.app.hoocons.ipainting.R;
 import com.app.hoocons.ipainting.ViewHolders.OnColorClickListener;
+import com.app.hoocons.ipainting.ViewHolders.OnImageSavedCallBack;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 
 /**
  * The Drawing fragment.
  */
-public class DrawingFragment extends Fragment implements View.OnClickListener, OnColorClickListener {
+public class DrawingFragment extends Fragment implements View.OnClickListener, OnColorClickListener, OnImageSavedCallBack {
     private final String TAG = this.getClass().getSimpleName();
 
     private final int MIN_STROKE_SIZE = 5;
     private final int IMAGE_PICKING_CODE = 1;
+    private final int READ_WRITE_STORAGE_PERMISSION_CODE = 2;
 
     /* View entities */
     private PaintView mPaintView;
@@ -86,6 +100,10 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
     // Popup menu will be used for more actions;
     private PopupMenu mMoreMenu;
+
+    // this a flag to tell if user has already sent one request to save an image and it is currently
+    // running in the background or not.
+    private boolean isSavingImage = false;
 
     public DrawingFragment() {
         // Required empty public constructor
@@ -153,7 +171,11 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         mCurrentSizeTv = (TextView) parent.findViewById(R.id.stroke_size);
     }
 
-
+    /*
+    * initViewEntities
+    *
+    * initialize the paintview and also display its initial properties to the screen
+    * */
     private void initViewEntities() {
         DisplayMetrics metrics = new DisplayMetrics();
 
@@ -177,6 +199,12 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         }
     }
 
+
+    /*
+    * startGalleryIntent
+    *
+    * Internal intent to request opening the gallery app in your android phone
+    * */
     private void startGalleryIntent() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -309,6 +337,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.save_action:
+                            attemptSavingImageToDisk();
                             return true;
                         case R.id.clear_action:
                             mPaintView.clear();
@@ -323,6 +352,67 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         mMoreMenu.show();
     }
 
+    /*
+    * attemptSavingImageToDisk
+    * -- This method will do mostly checking the permission of the app to the android system
+    * If the app have Read-Write external storage - we proceed to next step which is actually saving image service
+    * Else, we need to request the permission to the android system
+    * */
+    private void attemptSavingImageToDisk() {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            // request the permission with the request code WRITE_STORAGE_PERMISSION_CODE
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE},
+                    READ_WRITE_STORAGE_PERMISSION_CODE);
+        } else {
+            // Permission is already granted! Allow user to sent a request if there is none alive same-request
+            startSavingFileToDisk();
+        }
+    }
+
+
+    /*
+    * startSavingFileToDisk
+    *
+    * The actual process to requesting to start saving file
+    * This basically will cache the bitmap of the paintview and create a background service to save
+    * that bitmap into file
+    *
+    * We need to attach the callback listener because we want to know what happened back in the background
+    * and decide what to proceed for next step in main thread.
+    * */
+    private void startSavingFileToDisk() {
+        if (!isSavingImage ) {
+            isSavingImage = true;
+
+            mPaintView.setDrawingCacheEnabled(true);
+            Bitmap mImageBitmap = mPaintView.getDrawingCache();
+
+            new SaveImageToDiskAsync(mImageBitmap, this)
+                    .execute();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == READ_WRITE_STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // If the permission is granted from this code -- which meant user requested to save file
+                // Now the permission is granted -- start saving file to disk
+                startSavingFileToDisk();
+            } else {
+                // If the permission is denied -- show a toast to show why we asked
+                Toast.makeText(getContext(), R.string.permission_denied, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -416,5 +506,24 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
         if (colorPickerDialog != null)
             colorPickerDialog.dismiss();
+    }
+
+    @Override
+    public void onImageSaved(String savedFile, boolean isSuccess) {
+        Toast.makeText(getContext(), isSuccess? R.string.image_saved_message: R.string.error_occurs,
+                Toast.LENGTH_SHORT).show();
+
+        // Run a scan service to make sure new saved file will be available to the gallery
+        MediaScannerConnection.scanFile(getContext(),
+                new String[] { savedFile }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("ExternalStorage", "Scanned " + path + ":-> uri=" + uri);
+                    }
+                });
+
+        // Update the current flag to make sure the last requested saving request is now done
+        // Now user can send another same-request
+        isSavingImage = false;
     }
 }
