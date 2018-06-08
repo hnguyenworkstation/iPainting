@@ -1,12 +1,8 @@
 package com.app.hoocons.ipainting.Helpers;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
 
 import com.app.hoocons.ipainting.ViewHolders.OnImageSavedCallBack;
 

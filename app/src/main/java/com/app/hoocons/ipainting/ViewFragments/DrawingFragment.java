@@ -328,6 +328,13 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     }
 
 
+    /*
+    * Show extra menu by small popup for more actions
+    *
+    * Actions:
+    *   save_action: this menu will attempt saving the current painting to disk
+    *   clear_action: this menu will clear the whole painting (even the painting image background)
+    * */
     private void showPopUpMenu() {
         if (mMoreMenu == null) {
             mMoreMenu = new PopupMenu(getContext(), mMoreActionBtn);
@@ -340,8 +347,8 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
                             attemptSavingImageToDisk();
                             return true;
                         case R.id.clear_action:
-                            mPaintView.clear();
                             updateAction(Constants.Action.PAINTING);
+                            mPaintView.clear();
                             return true;
                         default:
                             return false;

@@ -32,11 +32,17 @@ public class MainActivity extends AppCompatActivity {
         showDrawingFragment();
     }
 
+    /*
+    * show the drawing fragment to main activity
+    *
+    * Note 6/8/2018: I planned to have multiple fragments on the main activity for different features
+    * However, I could not implement them on time so I decided put all the simple features to only drawing fragment.
+    * */
     private void showDrawingFragment() {
         mFragManager = getSupportFragmentManager();
         mFragManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         mFragManager.beginTransaction()
-                .add(R.id.fragment_container, mDrawingFragment, mDrawingFragment.getClass().getSimpleName())
+                .replace(R.id.fragment_container, mDrawingFragment, mDrawingFragment.getClass().getSimpleName())
                 .commit();
     }
 

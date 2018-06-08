@@ -144,6 +144,7 @@ public class PaintView extends View {
     * */
     public void clear() {
         paintStrokes.clear();
+        mBackgroundImage = null;
         removedStrokes.clear();
 
         invalidate();
