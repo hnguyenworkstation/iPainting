@@ -1,9 +1,7 @@
-<h2>iPainting</h2>
-
+### iPainting
 Simple Android application for painting and drawing
 
-<h2>Features</h2>
-
+### Features
 With the app, you can:
 
 - Draw on the screen using a finger
@@ -15,9 +13,8 @@ With the app, you can:
 - Able to add an image as a painting's background (this image will not be saved with the paint strokes)
 
 
-<h2>Application Demo</h2>
+### Application Demo
 [![App showcase](http://img.youtube.com/vi/pywFu6FliOA/0.jpg)](https://youtu.be/pywFu6FliOA)
 
-<h2>Credits</h2>
-
+### Credits
 - Logo Icon: Icon made by FreePik from www.flaticon.com
