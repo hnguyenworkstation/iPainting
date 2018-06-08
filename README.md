@@ -16,7 +16,7 @@ With the app, you can:
 
 
 <h2>Application Demo</h2>
-[![App showcase]((http://img.youtube.com/vi/pywFu6FliOA/0.jpg))](https://youtu.be/pywFu6FliOA)
+[![App showcase](http://img.youtube.com/vi/pywFu6FliOA/0.jpg)](https://youtu.be/pywFu6FliOA)
 
 <h2>Credits</h2>
 
