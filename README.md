@@ -14,7 +14,7 @@ With the app, you can:
 
 
 ### Application Demo
-[![App showcase](http://img.youtube.com/vi/pywFu6FliOA/0.jpg)](https://youtu.be/pywFu6FliOA)
+[![App showcase](https://img.youtube.com/vi/pywFu6FliOA/0.jpg)](https://youtu.be/pywFu6FliOA)
 
 ### Credits
 - Logo Icon: Icon made by FreePik from www.flaticon.com
