@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -39,6 +40,9 @@ public class PaintView extends View {
     private final String TAG = this.getClass().getSimpleName();
 
     private Paint mPaint;
+
+    private final Paint mPaintBitmap = new Paint(Paint.DITHER_FLAG);;
+    private Bitmap mBackgroundImage;
 
     private int currentPaintColor;
     private int backgroundColor;
@@ -102,7 +106,15 @@ public class PaintView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         // Drawing the screen background
+        canvas.save();
         canvas.drawColor(backgroundColor);
+
+        /*
+        * If user is editing an image => draw that image as canvas's background
+        * */
+        if (mBackgroundImage != null) {
+            canvas.drawBitmap(mBackgroundImage, 0,0, mPaintBitmap);
+        }
 
         // Drawing the strokes that previously drew to the screen
         Iterator iterator = paintStrokes.descendingIterator();
@@ -143,9 +155,20 @@ public class PaintView extends View {
      *
      * @param color new color for the brush
      */
-    public void changeColor(int color) {
+    public void changeBrushColor(int color) {
         mPaint.setColor(color);
         currentPaintColor = color;
+    }
+
+
+    /**
+     * Update background color.
+     *
+     * @param image background image
+     */
+    public void addBackgroundImage(Bitmap image) {
+        mBackgroundImage = image;
+        invalidate();
     }
 
 

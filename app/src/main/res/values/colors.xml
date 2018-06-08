@@ -14,6 +14,8 @@
     <color name="black_alpha_70">#B3000000</color>
     <color name="gray_alpha">#c2c2c2</color>
 
+    <color name="transparent">@android:color/transparent</color>
+
 
     <array name="colors">
         <item>#FF0000</item>

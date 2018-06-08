@@ -20,4 +20,5 @@
 
     <!-- Description value -->
     <string name="image_btn_description">General Action Image Button</string>
+    <string name="image_bg_desc">Background Image</string>
 </resources>

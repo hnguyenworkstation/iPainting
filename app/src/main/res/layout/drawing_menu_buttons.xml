@@ -12,6 +12,7 @@
         android:orientation="horizontal">
 
         <ImageButton
+            android:contentDescription="@string/image_btn_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_icon_button"
@@ -21,6 +22,7 @@
             android:foregroundGravity="center"/>
 
         <ImageButton
+            android:contentDescription="@string/image_btn_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_action_force_step"
@@ -74,6 +76,18 @@
                     style="@style/MenuTextStyle"
                     android:id="@+id/stroke_size"
                     android:text="16" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/MenuItemStyle"
+                android:id="@+id/image_picker">
+
+                <ImageView
+                    android:contentDescription="@string/image_btn_description"
+                    android:layout_margin="8dp"
+                    android:layout_width="@dimen/menu_icon_size"
+                    android:layout_height="@dimen/menu_icon_size"
+                    android:src="@drawable/ic_image"/>
             </LinearLayout>
         </LinearLayout>
     </HorizontalScrollView>

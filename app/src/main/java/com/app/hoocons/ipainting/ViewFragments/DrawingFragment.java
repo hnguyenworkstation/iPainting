@@ -1,15 +1,22 @@
 package com.app.hoocons.ipainting.ViewFragments;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,23 +25,32 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.hoocons.ipainting.Adapters.ColorPickerAdapter;
 import com.app.hoocons.ipainting.CustomUI.FilledCircleView;
 import com.app.hoocons.ipainting.CustomUI.PaintView;
+import com.app.hoocons.ipainting.Helpers.AppUtils;
 import com.app.hoocons.ipainting.Helpers.Constants;
 import com.app.hoocons.ipainting.R;
 import com.app.hoocons.ipainting.ViewHolders.OnColorClickListener;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * The Drawing fragment.
  */
 public class DrawingFragment extends Fragment implements View.OnClickListener, OnColorClickListener {
+    private final String TAG = this.getClass().getSimpleName();
+
     private final int MIN_STROKE_SIZE = 5;
+    private final int IMAGE_PICKING_CODE = 1;
 
     /* View entities */
     private PaintView mPaintView;
@@ -46,6 +62,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     /* Menu Actions */
     private LinearLayout mColorPicker;
     private LinearLayout mStrokeSizePicker;
+    private LinearLayout mImagePicker;
 
     private FilledCircleView mSelectedColorCircle;
     private FilledCircleView mSizeCircle;
@@ -65,7 +82,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
     private int[] colors;
 
     // Current action determine that if the user is currently wanted to draw or erase
-    private Constants.Action mCurrentAction;
+    private Constants.Action mCurrentAction = Constants.Action.PAINTING;
 
     // Popup menu will be used for more actions;
     private PopupMenu mMoreMenu;
@@ -129,6 +146,8 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
         mColorPicker = (LinearLayout) parent.findViewById(R.id.color_picker);
         mStrokeSizePicker = (LinearLayout) parent.findViewById(R.id.size_picker);
+        mImagePicker = (LinearLayout) parent.findViewById(R.id.image_picker);
+
         mSelectedColorCircle = (FilledCircleView) parent.findViewById(R.id.selected_color);
         mSizeCircle = (FilledCircleView) parent.findViewById(R.id.size_circle);
         mCurrentSizeTv = (TextView) parent.findViewById(R.id.stroke_size);
@@ -156,6 +175,13 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         } else {
             //Todo: Show an error message and reload app
         }
+    }
+
+    private void startGalleryIntent() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_PICKING_CODE);
     }
 
 
@@ -270,6 +296,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
 
         mColorPicker.setOnClickListener(this);
         mStrokeSizePicker.setOnClickListener(this);
+        mImagePicker.setOnClickListener(this);
     }
 
 
@@ -294,6 +321,29 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
             });
         }
         mMoreMenu.show();
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        /* Draw the image background if user requested it
+        * => Since the background is now an image so we need to update the background of paint view (canvas) to be transparent
+        * */
+        if (requestCode == IMAGE_PICKING_CODE && resultCode == Activity.RESULT_OK) {
+            try {
+                final Uri imageUri = data.getData();
+                final InputStream imageStream = getContext().getContentResolver().openInputStream(imageUri);
+                final Bitmap backGroundPic = BitmapFactory.decodeStream(imageStream);
+                Log.e(TAG, "onActivityResult: " + backGroundPic.getByteCount());
+
+                mPaintView.addBackgroundImage(backGroundPic);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -329,6 +379,9 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
                                 ViewGroup.LayoutParams.WRAP_CONTENT);
                 }
                 break;
+            case R.id.image_picker:
+                startGalleryIntent();
+                break;
             case R.id.pen_action_btn:
                 updateAction(Constants.Action.PAINTING);
                 break;
@@ -353,7 +406,7 @@ public class DrawingFragment extends Fragment implements View.OnClickListener, O
         currentColor = colors[position];
 
         if (mPaintView != null)
-            mPaintView.changeColor(currentColor);
+            mPaintView.changeBrushColor(currentColor);
 
         if (mSelectedColorCircle != null)
             mSelectedColorCircle.setColor(currentColor);

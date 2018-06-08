@@ -6,8 +6,8 @@
 
     <com.app.hoocons.ipainting.CustomUI.PaintView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:layout_below="@+id/custom_toolbar"
+        android:layout_height="match_parent"
         android:id="@+id/paint_view"/>
 
     <LinearLayout
