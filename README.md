@@ -16,7 +16,7 @@ With the app, you can:
 
 
 <h2>Application Demo</h2>
-[![App showcase](https://www.dropbox.com/s/z04h74p5dgogez0/34715080_1458695104234316_3323393011575947264_n.png?dl=0)](https://www.dropbox.com/s/o6ovmii7ykalxe7/video-1528472901.mp4?dl=0)
+[![App showcase]((http://img.youtube.com/vi/pywFu6FliOA/0.jpg))](https://youtu.be/pywFu6FliOA)
 
 <h2>Credits</h2>
 
